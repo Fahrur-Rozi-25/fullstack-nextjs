@@ -1,12 +1,33 @@
 'use client'
-import { useState } from "react"
+import { useState , SyntheticEvent } from "react"
 import type {Brand} from "@prisma/client"
+import { useRouter } from "next/navigation"
+import axios from "axios"
 
 const AddProduct = ({brands}: {brands: Brand[]}) => {
+    const [title , setTitle] = useState("");
+    const [price , setPrice] = useState("");
+    const [brand , setBrand] = useState("");
     const [isOpen , setIsOpen] = useState(false);
+
+    const router = useRouter()
 
     const handleModal = () => {
         setIsOpen(!isOpen);
+    }
+
+    const handleSubmit = async (e:SyntheticEvent) => {
+        e.preventDefault();
+        await axios.post('/api/products' , {
+            title: title,
+            price: Number(price),
+            BrandId: Number(brand)
+        })
+        setTitle("")
+        setPrice("")
+        setBrand("")
+        router.refresh()
+        setIsOpen(false);
     }
   return (
     <div>
@@ -17,18 +38,18 @@ const AddProduct = ({brands}: {brands: Brand[]}) => {
       <div className={isOpen ? 'modal modal-open' : 'modal'}>
         <div className="modal-box">
             <h3 className="font-bold text-lg">Add New Product</h3>
-            <form action="">
+            <form action="" onSubmit={handleSubmit}>
                 <div className="form-control w-full">
                     <label htmlFor="" className="label font-bold">Nama Product</label>
-                    <input type="text" name="" id="" className="input input-bordered" placeholder="Nama Product"/>
+                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} name="" id="" className="input input-bordered" placeholder="Nama Product"/>
                 </div>
                 <div className="form-control w-full">
                     <label htmlFor="" className="label font-bold">Price</label>
-                    <input type="text" name="" id="" className="input input-bordered" placeholder="Masukkan Harga"/>
+                    <input type="text" value={price} onChange={(e) => setPrice(e.target.value)} name="" id="" className="input input-bordered" placeholder="Masukkan Harga"/>
                 </div>
                 <div className="form-control w-full">
                     <label htmlFor="" className="label font-bold">Brand</label>
-                    <select name="" id="" className="select select-bordered">
+                    <select value={brand} onChange={(e) => setBrand(e.target.value)} name="" id="" className="select select-bordered">
                         <option value="" disabled>Pilih Brand</option>
                         {brands.map((brand) => (
                             <option value={brand.id} key={brand.id}>{brand.name}</option>
