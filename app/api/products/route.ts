@@ -13,6 +13,6 @@ export const POST = async (request : Request) => {
             BrandId: body.BrandId
         }
     });
-    return NextResponse.json(product)
+    return NextResponse.json(product , {status: 201})
 
 }
